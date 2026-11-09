@@ -1,0 +1,5 @@
+# Full synthetic artifacts remain available locally and can be regenerated/replayed.
+# Keep compact manifest/summary in version control, not 76 MB of raw run data.
+episodes.jsonl.gz
+predictions.jsonl.gz
+per_user.jsonl

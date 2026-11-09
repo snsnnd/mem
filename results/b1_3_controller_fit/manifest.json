@@ -1,0 +1,14 @@
+{
+  "python": "3.12.13",
+  "git_revision": "36a0be96546351f93757b2bc654261551b0506cf",
+  "git_dirty": true,
+  "source_sha256": {
+    "replay.py": "cdeb631429981047005a480d68d36c9c9513b3364ce74f6269b8039abe1d9c34",
+    "replay_baselines.py": "f10d5b73535bc092b6cc5c844f43dc884de91a0789fec5e5c04097107f12cff9",
+    "run_b1_3.py": "cef7d17407ba4eee2edf3ed6a3372cf55372759434f7379e865a670d96ff762e",
+    "learned_memory.py": "ca99ea2813369d78e33f3e94a1356ceaf0980d0841b25bee4d64c19185ca9955",
+    "train_memory_controller.py": "ced988f128b0abb204689bde39ab06132385b26606281981dee888f155a80cd4"
+  },
+  "torch": "2.15.0+cu132",
+  "numpy": "2.5.4"
+}

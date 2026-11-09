@@ -1,0 +1,91 @@
+{
+  "python": "3.12.13",
+  "git_revision": "36a0be96546351f93757b2bc654261551b0506cf",
+  "git_dirty": true,
+  "source_sha256": {
+    "replay.py": "cdeb631429981047005a480d68d36c9c9513b3364ce74f6269b8039abe1d9c34",
+    "replay_baselines.py": "f10d5b73535bc092b6cc5c844f43dc884de91a0789fec5e5c04097107f12cff9",
+    "run_b1_3.py": "cef7d17407ba4eee2edf3ed6a3372cf55372759434f7379e865a670d96ff762e"
+  },
+  "schema": "b1.3-replay-v1",
+  "protocol": "exogenous-structured-reports",
+  "arguments": {
+    "output": "results/b1_3_pilot",
+    "seeds": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9
+    ],
+    "users": 20,
+    "turns": 300,
+    "split": "pilot",
+    "scenarios": null,
+    "replay": null
+  },
+  "scenarios": [
+    {
+      "name": "stationary_clean",
+      "feedback_prob": 0.3,
+      "noise_prob": 0,
+      "drift": "none",
+      "temporary_prob": 0.0,
+      "scoped": false
+    },
+    {
+      "name": "sparse_noise",
+      "feedback_prob": 0.3,
+      "noise_prob": 0.2,
+      "drift": "abrupt",
+      "temporary_prob": 0.0,
+      "scoped": false
+    },
+    {
+      "name": "aba",
+      "feedback_prob": 0.5,
+      "noise_prob": 0.05,
+      "drift": "aba",
+      "temporary_prob": 0.0,
+      "scoped": false
+    },
+    {
+      "name": "transient_scoped",
+      "feedback_prob": 0.5,
+      "noise_prob": 0.05,
+      "drift": "none",
+      "temporary_prob": 0.15,
+      "scoped": true
+    },
+    {
+      "name": "transient_unscoped",
+      "feedback_prob": 0.5,
+      "noise_prob": 0.05,
+      "drift": "none",
+      "temporary_prob": 0.15,
+      "scoped": false
+    }
+  ],
+  "trace_content_sha256": "e2501fb215b7163552b01ab3de9062590054a326b8887447bca36556f30e8553",
+  "baselines": {
+    "Context-DiscountedCounts": {
+      "discount": 0.98,
+      "prior": 0.5
+    },
+    "Context-Delta": {
+      "eta": 0.4,
+      "decay": 0.99
+    },
+    "Context-HazardFilter": {
+      "hazard": 0.01,
+      "noise": 0.1
+    }
+  },
+  "recovery_window": 3,
+  "mock_adherence": 0.85
+}

@@ -1,5 +1,21 @@
 # Personal Cortex Lab
 
+> **研究状态（2026-11-09）**：下文保留早期探索记录，其中“优于梯度”“Hypernet 更优”等表述尚未经过公平、充分验证。当前已确认的价值主要是上下文隔离与证据累积，**尚未证明可训练神经记忆超越强基线**。新的[文献调研、代码审计与 B1.3 协议](docs/RESEARCH_REVIEW_B1_3.md)将共同轨迹回放和学习式控制器验证分开推进；[10 种子 pilot 结果](docs/B1_3_PILOT_RESULTS.md)已记录，但不等于已完成神经控制器实验。
+
+### 可训练控制器实验入口
+
+真正可训练的共享 MLP/GRU 写入与遗忘门控已加入，采用独立的训练、验证与测试阶段。设计、容量差异和监督边界见 [B1.3 控制器协议](docs/B1_3_CONTROLLER_PROTOCOL.md)。训练成功不等于优于基线。
+
+**首轮留出测试已完成**：[完整结果](docs/B1_3_CONTROLLER_RESULTS.md)。ID 宏平均状态准确率：调优 HazardFilter **94.79%**、MLP **94.66%**、GRU **94.57%**。主指标未胜出；GRU 在部分变化场景的局部优势伴随噪声鲁棒性的代价。
+
+```bash
+.venv/bin/python -m unittest discover -s tests -v
+.venv/bin/python -m personal_cortex_lab.train_memory_controller fit --output results/b1_3_controller_fit
+.venv/bin/python -m personal_cortex_lab.train_memory_controller test --fit results/b1_3_controller_fit --output results/b1_3_controller_test
+```
+
+输出目录必须不存在；大体积轨迹、预测和权重本地保留，摘要与实验选择记录可纳入版本管理。
+
 让大模型本地维护一个**可动态生长/退化的小网络**，记录并学习使用者的习惯与长期记忆，每次调用前把小网络的输出附加到提示词（或权重）里，让大模型拥有属于个人的长期记忆。
 
 > 一句话：**大模型是大脑通用智能，小网络是你的贴身管家。**

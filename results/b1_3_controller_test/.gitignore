@@ -1,0 +1,5 @@
+# Keep full local experiment artifacts without committing large files.
+*.gz
+*.npz
+*.pt
+per_user.jsonl

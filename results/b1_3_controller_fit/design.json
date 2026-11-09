@@ -1,0 +1,99 @@
+{
+  "schema": "b1.3-controller-v1",
+  "supervision": "privileged-synthetic-latent-prequential",
+  "turns": 300,
+  "train_seeds": [
+    1000,
+    1001,
+    1002,
+    1003,
+    1004,
+    1005,
+    1006,
+    1007,
+    1008,
+    1009,
+    1010,
+    1011,
+    1012,
+    1013,
+    1014,
+    1015,
+    1016,
+    1017,
+    1018,
+    1019
+  ],
+  "validation_seeds": [
+    2000,
+    2001,
+    2002,
+    2003,
+    2004,
+    2005,
+    2006,
+    2007,
+    2008,
+    2009
+  ],
+  "test_seeds": [
+    3000,
+    3001,
+    3002,
+    3003,
+    3004,
+    3005,
+    3006,
+    3007,
+    3008,
+    3009,
+    3010,
+    3011,
+    3012,
+    3013,
+    3014,
+    3015,
+    3016,
+    3017,
+    3018,
+    3019
+  ],
+  "test_users": 10,
+  "train_users": 4,
+  "validation_users": 4,
+  "initializations": [
+    17,
+    29,
+    43
+  ],
+  "id_scenarios": [
+    "stationary_clean",
+    "sparse_noise",
+    "aba",
+    "transient_scoped",
+    "transient_unscoped"
+  ],
+  "ood_scenarios": [
+    "ood_noise35",
+    "ood_sparse10",
+    "ood_renewal"
+  ],
+  "epochs": 12,
+  "batch_size": 64,
+  "learning_rate": 0.003,
+  "selection": "validation macro hidden_acc; NLL breaks ties; one global config per family",
+  "primary": "macro ID hidden_acc vs validation-selected global baseline; practical threshold +0.01",
+  "source_sha256": {
+    "replay.py": "cdeb631429981047005a480d68d36c9c9513b3364ce74f6269b8039abe1d9c34",
+    "replay_baselines.py": "f10d5b73535bc092b6cc5c844f43dc884de91a0789fec5e5c04097107f12cff9",
+    "run_b1_3.py": "cef7d17407ba4eee2edf3ed6a3372cf55372759434f7379e865a670d96ff762e",
+    "learned_memory.py": "ca99ea2813369d78e33f3e94a1356ceaf0980d0841b25bee4d64c19185ca9955",
+    "train_memory_controller.py": "ced988f128b0abb204689bde39ab06132385b26606281981dee888f155a80cd4"
+  },
+  "dataset_sha256": {
+    "train": "f2c81f53a534c1f2211d35eae33c1db79c6bb91ad18dfa5d5a5260c71c9774aa",
+    "validation": "7b1f6ab0072c346bc431bc47a2285eef7de168b412a423f93cab33f86f7cc288"
+  },
+  "baseline_search": {},
+  "controllers": []
+}
