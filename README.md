@@ -105,12 +105,20 @@ src/personal_cortex_lab/
   run_multiturn.py      # 3 真人设 10 轮真多轮对话
   hypernetwork.py       # Hyper LoRA 生成器
   run_hypernetwork.py   # Prompt vs ΔW
+  run_fair_benchmark.py # 公平对照：去 oracle、去污染、加 Latest-Value
+  run_b1.py             # B1 Causal Online Preference Learning
+  run_longrun_noise.py  # 1000 轮长跑 + 噪音
+  run_vague_predictor.py# Transformer 预测纠正类型
+  run_pred_as_signal.py # 预测器作为反馈信号
+  run_value_parser.py   # 维度+值解析器
+  run_llm_encoder_parser.py # Qwen隐状态编码器 vs 哈希 (in scripts/)
   subagent_users.py     # 子代理当用户的模板
 
 scripts/
   run_qwen_hypernet.py   # 真 Qwen2.5-0.5B FP16 + Hypernet LoRA (4060 MPS)
   train_hypernet.py      # 真 Qwen 增量训练：单独 LoRA 蒸馏 -> Hypernet 学映射
   test_zero_shot.py      # 零样本组合习惯测试
+  run_llm_encoder_parser.py # LLM-as-encoder (Qwen hidden 896维) vs 哈希
 
 docs/
   ARCHITECTURE.md       # 详细架构和背景调研
@@ -182,13 +190,68 @@ Hypernet ΔW  corr 0.182 token 0 (merged)
 
 **Hypernet 不仅更快，而且从 `habit_vec -> LoRA ΔW` 直接跳到权重空间**，完成了“习惯向量，下一跳直接是权重”这层验证。
 
-### 6. 真 Qwen2.5-0.5B（4060测）
+### 6. B1 公平基准（去 oracle / 去污染 / 加强基线）
+
+```
+dense explicit, no drift:
+  NoMemory 0.917 | Latest 0.748 | Rule 0.748 | Bayesian 0.734 | ContextKV 0.397
+
+sparse 30%, noise10%, abrupt drift:
+  Latest 0.790 recovery 51.0 | Rule 0.790 | Bayesian 0.761 recov 86.0 | ContextKV 0.441 recov 33.9
+
+sparse noise10% gradual:
+  Latest 0.778 | ContextKV 0.449 | Bayesian 0.750
+
+sparse noise10% aba:
+  Latest 0.784 | ContextKV 0.450 | Bayesian 0.751
+
+vague, noise10%, abrupt:
+  All 0.911 (全部挂) -> 最新问题
+```
+
+结论：
+
+* 明确反馈静态时 Latest-Value 已经够，复杂网络没独立优势
+* 漂移下 ContextKV 分片赢 0.35，是目前真正的杠杆
+* Bayesian 比 Latest 好 0.03 err 但恢复慢 35 轮：稳定性-可塑性权衡真实
+
+### 7. 真 Qwen2.5-0.5B（4060测）
 
 * FP16，1GB 模型，RTX 4060 8GB 显存够余 7G。
 * 零 LoRA Base vs 三种注入对比。
 * 三习惯 LoRA 蒸馏：`code_first: L2 2.40 / table: 2.38 / prose: 2.38`
 * Hypernet 训练：`MSE 0.0085 -> 0.0000`
 * 零样本组合 `long+emoji+code_first` 生成了代码，但没 emoji——因为训练数据里没见过 emoji，这是预料内的小数据问题。
+
+### 8. 反馈编码器：Transformer 预测纠正类型
+
+```
+训练预测器（任务+答案风格 -> 纠正维）: train acc 0.718 (chance 0.25)
+vague 无预测: 0.911
+vague 只猜维: 0.886 (delta -0.025)
+vague 猜维+值 (dim+value parser): 0.762 (-0.149 vs vague)
+```
+
+结论：预测器方向对了，但当前只猜维度增益小（0.913→0.886）。瓶颈是“猜对维以后怎么拿对值”，值错写会把增益抵掉。猜维+值分布把值也一起给，错误回到 0.762，涨得更明显，但仍虚高（句式背诵过拟合）。
+
+### 9. LLM 作为编码器（Qwen2.5-0.5B 隐状态 896维）
+
+```
+训练短语: 1.000
+未见同义: 0.857 (哈希背诵在未见词上会直接跌)
+```
+
+大模型自身的翻译能力会把“删掉表情符号”/“别用 emoji”拉得很近，远比哈希词袋抗换说法。验证了“直接用大模型预测器权重”这条路有泛化增益，且共享表示不需第二套字典。
+
+### 10. 长跑 1000 轮 + 噪音鲁棒
+
+```
+1000 轮静态: Static/Rule/Hybrid 全部 0.386，槽位稳在 3 个，没爆
+任务轮换 4 相位: Rule 0.70/0.53/0.68/0.54 vs TaskPart 0.41/0.39/0.39/0.38
+噪音 10% 假纠正: Static/Rule/Hybrid 全部 0.465，MLP trust 没过滤到噪音
+```
+
+生长/退化在“隔离任务冲突”上已经兑现了，分片把跨任务互相覆盖都防住了；噪音鲁棒还没做出来，下一轮先加确认门槛。
 
 ---
 
@@ -239,9 +302,13 @@ python scripts/test_zero_shot.py      # 零样本组合测试
 * [x] MLP / 赫布 / 路由三套对照
 * [x] 真人话子代理多轮
 * [x] Prompt vs ΔW
-* [ ] 真 Qwen2.5-0.5B 完整训练（EMOJI/long 的 LoRA 数据已蒸馏出来了，但零样本组合的训练任务里没有 emoji，需要补一轮 emoji 习惯数据）
-* [ ] BGE / Qwen3-Emb-4B 替换 hash 代理编码器
-* [ ] Hypernet 升到多层生成（现在只最后层 22528 维）
+* [x] B1 公平基准（去 oracle / 去污染）+ Latest-Value
+* [x] 长跑、任务轮换、噪音鲁棒
+* [x] Transformer 预测纠正类型 + LLM-encoder 未见同义泛化
+* [ ] 把 Value Parser 换成 BGE/Qwen3-Emb 真编码器版（现在是冻结的 Qwen hidden）
+* [ ] 模糊反馈：从“只猜维”升级到“维+值分布+置信度”并测 false update 率
+* [ ] 任务键把 recovery 33.9 优势撑大：临时习惯 vs 长期习惯冲突
+* [ ] Hypernet 升到多层生成（现在只最后层 22528 维），补 emoji 数据（训练基没见过 emoji）
 * [ ] App 化：本地 FastAPI + SQLite vec
 
 ---
