@@ -1,0 +1,30 @@
+{
+  "A - No Memory": {
+    "name": "A - No Memory",
+    "avg_corr": 0.9195833333333333,
+    "avg_dim": 0.5577777777777778,
+    "pref_match": 0.4422222222222222,
+    "recall": 0.0,
+    "stats": {}
+  },
+  "B - Static RAG": {
+    "name": "B - Static RAG",
+    "avg_corr": 0.40166666666666667,
+    "avg_dim": 0.16,
+    "pref_match": 0.84,
+    "recall": 1.0,
+    "stats": {}
+  },
+  "C - Dynamic Cortex (grow/degrade)": {
+    "name": "C - Dynamic Cortex (grow/degrade)",
+    "avg_corr": 0.40166666666666667,
+    "avg_dim": 0.16,
+    "pref_match": 0.84,
+    "recall": 1.0,
+    "stats": {
+      "avg_slots": 3,
+      "avg_growth": 3,
+      "avg_prune": 0
+    }
+  }
+}
